@@ -3,7 +3,7 @@
 
   <head> 
     <meta charset="utf-8">
-    <title> Earthquake List</title>
+    <title> Volcano List</title>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
 
     
@@ -92,8 +92,8 @@
       let response, volcano, africa, table;
       response = await fetch('volcano.geojson')
       volcano = await response.json();
-      response = await fetch('japan.json');
-      japan = await response.json();
+      response = await fetch('africa.json');
+      africa = await response.json();
 
       table = document.getElementsByTagName("table")[0];
       let row, cell1, cell2, cell3;
@@ -130,7 +130,7 @@
 
 
     map.addSource('africa', {
-        type: 'json',
+        type: 'geojson',
         data: africa
     });
 
@@ -140,7 +140,7 @@
         'source': 'africa',
         'paint': {
             'fill-color': '#0080ff', 
-            'fill-opacity': 0.5
+            'fill-opacity': 0.2
         }
     });
 
