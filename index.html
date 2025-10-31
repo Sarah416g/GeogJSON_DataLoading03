@@ -26,8 +26,9 @@
       }
 
       #side-panel{
-        flex-basis: 500px;
+        flex-basis: 400px;
         overflow-y: scroll;
+        
         
       }
       #map{
@@ -43,6 +44,13 @@
         border-spacing: 0;
         width: 100%;
         border:1px solid #dce1e7;
+    
+      }
+      @media screen and (max-width:1024px) {
+        #side-panel {
+          display: none;
+        }
+        
       }
 
       th, 
