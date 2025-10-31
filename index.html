@@ -1,6 +1,192 @@
 <!DOCTYPE html>
-    <head>
+<html lang="en-US">
 
-    </head>
+  <head> 
+    <meta charset="utf-8">
+    <title> Earthquake List</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
+    
+    <style>
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #container{
+        display: flex;
+        height: 100vh; 
+        flex-direction: row;
+        align-items: stretch;
+      }
+
+      #side-panel{
+        flex-basis: 500px;
+        overflow-y: scroll;
+        
+      }
+      #map{
+        flex-grow: 1;
+      }
+
+      button{
+        margin-bottom: 10px;
+      }
+
+      table{
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border:1px solid #dce1e7;
+      }
+
+      th, 
+      td {
+        text-align: left;
+        padding: 16px;
+      }
+      tr:nth-child(even) {
+        background-color: #7c9ae4;
+      }
+      tr:nth-child(odd) {
+        background-color: #adc2db
+      }
+      
+    </style>
+  </head>
+
+  <body> 
+    <main id="container">
+        <div id="side-panel">
+          <h2> Volcano List</h2>
+          <button>Sort by Year</button>
+          <table>
+            <tr>
+                <th>Year</th>
+                <th>Name</th>
+                <th>Location</th>
+            </tr>
+          </table>
+          </div>
+        <div id="map"></div>
+
+
+      </main>
+      <script> 
+        mapboxgl.accessToken =
+                'pk.eyJ1Ijoic2FyYWg0MTZnIiwiYSI6ImNtaGJoenMxaDA4YnEyaXEzcWxndHU0eXIifQ.4QXv1mFBF5rxr1qxpOSZTg';
+    
+    let map = new mapboxgl.Map({
+      container: 'map', 
+      style: 'mapbox://styles/mapbox/dark-v11',
+      zoom: 1.0,
+      center: [0, 0]
+    });
+
+    async function geojsonFetch() {
+      let response, volcano, africa, table;
+      response = await fetch('volcano.geojson')
+      volcano = await response.json();
+      response = await fetch('japan.json');
+      japan = await response.json();
+
+      table = document.getElementsByTagName("table")[0];
+      let row, cell1, cell2, cell3;
+      for (let i = 0; i < volcano.features.length; i++) {
+    // Create an empty <tr> element and add it to the 1st position of the table:
+          row = table.insertRow(-1);
+          cell1 = row.insertCell(0);
+          cell2 = row.insertCell(1);
+          cell3 = row.insertCell(2);
+          cell1.innerHTML = volcano.features[i].properties.Year;
+          cell2.innerHTML = volcano.features[i].properties.Name;
+          cell3.innerHTML = volcano.features[i].properties.Location;
+}
+    
+
+    map.on('load', function loadingData() {
+
+    map.addSource('volcano', {
+        type: 'geojson',
+        data: volcano
+    });
+
+    map.addLayer({
+        'id': 'volcano-layer',
+        'type': 'circle',
+        'source': 'volcano',
+        'paint': {
+            'circle-radius': 8,
+            'circle-stroke-width': 2,
+            'circle-color': 'blue',
+            'circle-stroke-color': 'purple'
+        }
+    });
+
+
+    map.addSource('africa', {
+        type: 'json',
+        data: africa
+    });
+
+    map.addLayer({
+        'id': 'africa-layer',
+        'type': 'fill',
+        'source': 'africa',
+        'paint': {
+            'fill-color': '#0080ff', 
+            'fill-opacity': 0.5
+        }
+    });
+
+});
+    }
+    geojsonFetch();
+
+    let btn = document.getElementsByTagName("button")[0];
+
+btn.addEventListener('click', sortTable);
+
+// define the function to sort table
+function sortTable(e) {
+    let table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementsByTagName("table")[0];
+    switching = true;
+    /*Make a loop that will continue until
+    no switching has been done:*/
+    while (switching) {
+        //start by saying: no switching is done:
+        switching = false;
+        rows = table.rows;
+        /*Loop through all table rows (except the
+        first, which contains table headers):*/
+        for (i = 1; i < (rows.length - 1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            x = parseFloat(rows[i].getElementsByTagName("td")[0].innerHTML);
+            y = parseFloat(rows[i + 1].getElementsByTagName("td")[0].innerHTML);
+            //check if the two rows should switch place:
+            if (x < y) {
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+            }
+        }
+        if (shouldSwitch) {
+            /*If a switch has been marked, make the switch
+            and mark that a switch has been done:*/
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+}
+    </script>
+  </body>
 </html>
- 
